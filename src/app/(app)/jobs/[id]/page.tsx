@@ -211,15 +211,20 @@ export default async function JobDetailPage({ params }: PageProps) {
                           <p className="text-xs text-gray-400">{a.contractor.city}</p>
                         )}
                       </div>
-                      <span className={cn(
-                        "badge",
-                        a.status === "accepted" ? "bg-green-100 text-green-800" :
-                        a.status === "declined" ? "bg-red-100 text-red-700" :
-                        a.status === "sent" ? "bg-blue-100 text-blue-700" :
-                        "bg-gray-100 text-gray-600"
-                      )}>
-                        {a.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "badge",
+                          a.status === "accepted" || a.status === "completed" ? "bg-green-100 text-green-800" :
+                          a.status === "declined" ? "bg-red-100 text-red-700" :
+                          a.status === "sent" ? "bg-blue-100 text-blue-700" :
+                          "bg-gray-100 text-gray-600"
+                        )}>
+                          {a.status}
+                        </span>
+                        <Link href={`/jobs/${id}/assignment/${a.id}`} className="text-xs text-brand-600 hover:text-brand-700 font-medium">
+                          Manage →
+                        </Link>
+                      </div>
                     </div>
                     {a.agreed_rate && (
                       <p className="text-xs text-gray-500 mt-2">
@@ -241,9 +246,10 @@ export default async function JobDetailPage({ params }: PageProps) {
               <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                 <Package className="w-4 h-4 text-gray-400" /> Deliverables
               </h2>
-              <Link href={`/jobs/${id}/deliverables/new`} className="btn-secondary text-xs py-1.5">
-                + Add
-              </Link>
+              <div className="flex gap-2">
+                <Link href="/deliverables" className="text-xs text-brand-600 hover:text-brand-700 font-medium py-1.5">View all</Link>
+                <Link href={`/jobs/${id}/deliverables/new`} className="btn-secondary text-xs py-1.5">+ Add</Link>
+              </div>
             </div>
 
             {!deliverables || deliverables.length === 0 ? (
@@ -251,9 +257,9 @@ export default async function JobDetailPage({ params }: PageProps) {
             ) : (
               <div className="space-y-2">
                 {deliverables.map((d: any) => (
-                  <div key={d.id} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                  <div key={d.id} className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{d.file_name ?? d.type}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{d.file_name ?? d.type ?? "File"}</p>
                       {(d.drive_link || d.dropbox_link || d.file_url) && (
                         <a
                           href={d.drive_link ?? d.dropbox_link ?? d.file_url}
@@ -264,15 +270,21 @@ export default async function JobDetailPage({ params }: PageProps) {
                           View file ↗
                         </a>
                       )}
+                      {d.revision_notes && (
+                        <p className="text-xs text-amber-700 mt-1">{d.revision_notes}</p>
+                      )}
                     </div>
-                    <span className={cn(
-                      "badge",
-                      d.status === "approved" || d.status === "delivered" ? "bg-green-100 text-green-800" :
-                      d.status === "uploaded" ? "bg-blue-100 text-blue-700" :
-                      "bg-gray-100 text-gray-600"
-                    )}>
-                      {d.status}
-                    </span>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <span className={cn(
+                        "badge",
+                        d.status === "approved" || d.status === "delivered" ? "bg-green-100 text-green-800" :
+                        d.status === "uploaded" ? "bg-blue-100 text-blue-700" :
+                        d.status === "rejected" ? "bg-red-100 text-red-600" :
+                        "bg-gray-100 text-gray-600"
+                      )}>
+                        {d.status}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -335,6 +347,9 @@ export default async function JobDetailPage({ params }: PageProps) {
               </Link>
               <Link href={`/jobs/${id}/assign`} className="btn-secondary w-full justify-center text-xs">
                 Assign Contractor
+              </Link>
+              <Link href={`/jobs/${id}/expenses`} className="btn-secondary w-full justify-center text-xs">
+                Expenses &amp; Profitability
               </Link>
               <Link href={`/jobs/${id}/edit`} className="btn-secondary w-full justify-center text-xs">
                 Edit Job
